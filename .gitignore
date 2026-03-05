@@ -18,11 +18,11 @@
 *.snm
 *.vrb
 
-# LaTeX output in latex subdirectories
-**/latex/*.pdf
+# LaTeX forrásfájlok (csak a PDF-ek mennek fel)
+**/latex/
 
-# Root LaTeX output
-/Feladatlap.pdf
+# Gyökér LaTeX forrás (csak a PDF megy fel)
+/Feladatlap.tex
 
 # Megoldás notebookok (egyelőre nem publikus)
 03_reszveny_elemzes/AI_alapu_reszvenyelemzes_megoldas.ipynb
