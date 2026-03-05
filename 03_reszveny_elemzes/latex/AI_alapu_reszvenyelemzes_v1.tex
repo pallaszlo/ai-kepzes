@@ -1,0 +1,594 @@
+% !TEX encoding = UTF-8 Unicode
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable, skins, listings}
+
+\geometry{a4paper, top=2.2cm, bottom=2.2cm, left=2.5cm, right=2.5cm}
+
+\definecolor{accentblue}{RGB}{30, 80, 160}
+\definecolor{promptbg}{RGB}{242, 244, 248}
+\definecolor{promptborder}{RGB}{30, 80, 160}
+\definecolor{warnbg}{RGB}{255, 248, 235}
+\definecolor{warnborder}{RGB}{190, 80, 0}
+\definecolor{tipbg}{RGB}{240, 248, 240}
+\definecolor{tipborder}{RGB}{50, 130, 60}
+\definecolor{darkgray}{RGB}{70, 70, 70}
+\definecolor{medgray}{RGB}{130, 130, 130}
+\definecolor{cheatbg}{RGB}{250, 250, 252}
+\definecolor{cheatborder}{RGB}{30, 80, 160}
+\definecolor{labelcolor}{RGB}{40, 40, 100}
+\definecolor{notebg}{RGB}{245, 245, 255}
+\definecolor{noteborder}{RGB}{100, 100, 180}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{medgray}{AI-alapú részvényelemzés}}
+\fancyhead[R]{\small\textcolor{medgray}{Sapientia EMTE -- dr.\ Pál László}}
+\fancyfoot[C]{\small\textcolor{medgray}{\thepage}}
+\renewcommand{\headrulewidth}{0.3pt}
+
+\titleformat{\section}{\large\bfseries\color{accentblue}}{\thesection}{0.6em}{}%
+  [\vspace{-2pt}\textcolor{accentblue}{\rule{\linewidth}{0.6pt}}]
+\setcounter{secnumdepth}{0}
+\titleformat{\subsection}{\normalsize\bfseries\color{darkgray}}{}{0em}{}
+\titlespacing{\section}{0pt}{18pt}{8pt}
+\titlespacing{\subsection}{0pt}{12pt}{4pt}
+
+\lstdefinestyle{promptlst}{
+  basicstyle=\small\ttfamily\color{black},
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=none,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  literate=
+    {á}{{\'{a}}}1 {é}{{\'{e}}}1 {í}{{\'{i}}}1 {ó}{{\'{o}}}1 {ö}{{\"o}}1
+    {ő}{{\H{o}}}1 {ú}{{\'{u}}}1 {ü}{{\"u}}1 {ű}{{\H{u}}}1
+    {Á}{{\'{A}}}1 {É}{{\'{E}}}1 {Í}{{\'{I}}}1 {Ó}{{\'{O}}}1 {Ö}{{\"O}}1
+    {Ő}{{\H{O}}}1 {Ú}{{\'{U}}}1 {Ü}{{\"U}}1 {Ű}{{\H{U}}}1,
+}
+
+\tcbset{
+  promptstyle/.style={
+    breakable, enhanced,
+    colback=promptbg, colframe=promptborder,
+    boxrule=1pt, arc=3pt,
+    left=10pt, right=10pt, top=10pt, bottom=8pt,
+    attach boxed title to top left={xshift=10pt, yshift=-\tcboxedtitleheight/2},
+    boxed title style={
+      colback=promptborder, colframe=promptborder,
+      arc=2pt, boxrule=0pt,
+      left=6pt, right=6pt, top=2pt, bottom=2pt
+    },
+    coltitle=white, fonttitle=\footnotesize\bfseries\sffamily,
+  },
+  warnstyle/.style={
+    breakable, colback=warnbg, colframe=warnborder,
+    boxrule=0.5pt, leftrule=3pt, arc=2pt,
+    left=8pt, right=8pt, top=5pt, bottom=5pt,
+    fontupper=\small\sffamily,
+  },
+  tipstyle/.style={
+    breakable, colback=tipbg, colframe=tipborder,
+    boxrule=0.5pt, leftrule=3pt, arc=2pt,
+    left=8pt, right=8pt, top=5pt, bottom=5pt,
+    fontupper=\small\sffamily,
+  },
+  cheatstyle/.style={
+    breakable, enhanced, colback=cheatbg, colframe=cheatborder,
+    boxrule=0.8pt, arc=3pt,
+    left=10pt, right=10pt, top=9pt, bottom=7pt,
+    attach boxed title to top left={xshift=10pt, yshift=-\tcboxedtitleheight/2},
+    boxed title style={
+      colback=cheatborder, colframe=cheatborder,
+      arc=2pt, boxrule=0pt,
+      left=6pt, right=6pt, top=2pt, bottom=2pt
+    },
+    coltitle=white, fonttitle=\footnotesize\bfseries\sffamily,
+  },
+  notestyle/.style={
+    breakable, colback=notebg, colframe=noteborder,
+    boxrule=0.5pt, leftrule=3pt, arc=2pt,
+    left=8pt, right=8pt, top=5pt, bottom=5pt,
+    fontupper=\small\sffamily,
+  },
+}
+
+\newtcblisting{prompt}[1][Prompt]{
+  promptstyle, title=#1,
+  listing only,
+  listing options={style=promptlst},
+}
+
+\newcommand{\warn}[1]{%
+  \vspace{3pt}%
+  \begin{tcolorbox}[warnstyle]%
+  \textbf{\textcolor{warnborder}{Figyelem:}} #1%
+  \end{tcolorbox}\vspace{2pt}}
+
+\newcommand{\tip}[1]{%
+  \vspace{3pt}%
+  \begin{tcolorbox}[tipstyle]%
+  \textbf{\textcolor{tipborder}{Tipp:}} #1%
+  \end{tcolorbox}\vspace{2pt}}
+
+\newcommand{\note}[1]{%
+  \vspace{3pt}%
+  \begin{tcolorbox}[notestyle]%
+  \textbf{\textcolor{noteborder}{Változtatási javaslat:}} #1%
+  \end{tcolorbox}\vspace{2pt}}
+
+\newcommand{\lbl}[1]{\vspace{6pt}\noindent{\small\bfseries\textcolor{labelcolor}{#1}}\par\smallskip}
+
+\hypersetup{colorlinks=true, linkcolor=accentblue, urlcolor=accentblue}
+
+\begin{document}
+
+\thispagestyle{empty}
+\begin{center}
+  {\LARGE\bfseries AI-alapú részvényelemzés}\\[5pt]
+  {\normalsize Generatív AI és alkalmazások modul}\\[1pt]
+  {\small\color{medgray} dr.\ Pál László, Sapientia EMTE, 2026. március 6--7.}
+\end{center}
+
+\vspace{10pt}
+\noindent
+\begin{tabularx}{\linewidth}{lXr}
+\toprule
+\textbf{Blokk} & \textbf{Tartalom} & \textbf{Időtartam} \\
+\midrule
+1.\ rész & Adatletöltés + alapvizualizáció (árfolyam, napi hozam, kumulált hozam) & $\sim$30 perc \\
+2.\ rész & FinBERT sentiment elemzés & $\sim$40 perc \\
+3.\ rész & Kereskedési stratégia (technikai indikátorok + backtesting) & $\sim$30 perc \\
+\midrule
+\multicolumn{2}{l}{\textbf{Teljes blokk}} & \textbf{$\sim$100 perc} \\
+\bottomrule
+\end{tabularx}
+
+\smallskip
+\noindent\textbf{Eszközök:} Google Colab (\texttt{colab.research.google.com}),
+Gemini (\texttt{gemini.google.com})
+
+\vspace{8pt}
+
+%=============================================================
+\section{1. RÉSZ -- Adatletöltés és alapvizualizáció}
+%=============================================================
+
+\noindent\textit{Cél: Letöltjük a részvény és az S\&P~500 index historikus adatait.
+Az árfolyamot USD-ben vizualizáljuk, a napi hozamot csak a részvényre nézzük,
+a kumulált hozamnál pedig megjelenik az index összehasonlítás.
+Az első két cella (telepítés, adatletöltés) előre megírva szerepel a notebookban -- csak futtatni kell.}
+
+\bigskip
+
+%--- Telepítés ---
+\subsection{0. lépés -- Telepítés és adatletöltés}
+
+\noindent Futtasd le sorban a notebook első celláit:
+
+\begin{enumerate}[noitemsep, topsep=4pt]
+  \item \textbf{Telepítés / importok} -- csomagok betöltése
+  \item \textbf{Adatletöltés} -- az AAPL részvény \textit{és} az S\&P~500 index (\texttt{\^{}GSPC}) letöltése 2020-tól 2024 végéig
+\end{enumerate}
+
+\bigskip
+
+%--- 1. feladat: árfolyam ---
+\subsection{1. feladat -- Árfolyam grafikon}
+
+\noindent Vizualizáljuk, hogyan alakult az Apple részvény záróárfolyama USD-ben
+az elmúlt években. A \texttt{df} DataFrame \texttt{Close} oszlopa tartalmazza
+a napi záróárakat.
+
+\bigskip
+
+\lbl{Feladat:}
+Fogalmazz meg egy promptot a Gemini számára, amely megjeleníti a részvény árfolyamát!
+
+\begin{prompt}[Javasolt prompt]
+Te egy Python adatvizualizációs szakértő vagy.
+### Feladat
+Írj Python kódot, amely megjeleníti a df DataFrame Close oszlopát
+idősoros vonaldiagramként.
+### Formátum
+- Legyen cím, tengelyfeliratok (x: Dátum, y: Árfolyam USD)
+- figsize=(14, 5)
+### Kontextus
+df egy pandas DataFrame, dátum indexszel és Close oszloppal.
+\end{prompt}
+
+\noindent A kapott kódot másold be a notebook megfelelő cellájába és futtasd le.
+
+\medskip\lbl{Módosítás -- jelöld meg a fontos időszakokat!}
+
+\begin{prompt}[Módosító prompt]
+Módosítsd az előző kódot úgy, hogy a következő időszakok
+explicit látszódjanak a diagramon színezett háttérrel:
+- COVID-összeomlás: 2020-02 -- 2020-06
+- Ukrajna háború + kamatemelés: 2022-02 -- 2022-12
+Minden időszakhoz legyen felirat is a diagramon.
+\end{prompt}
+
+\note{Próbáld ki más részvénnyel is! Cseréld le a \texttt{TICKER} értékét
+(pl.\ \texttt{"MSFT"}, \texttt{"TSLA"}, \texttt{"NVDA"}) és futtasd újra
+az adatletöltő cellát.}
+
+\bigskip
+
+%--- 2. feladat: napi hozam ---
+\subsection{2. feladat -- Napi hozam}
+
+\noindent Az árfolyam önmagában nem mutatja meg, mekkora volt a napi változás.
+A napi hozam (daily return) ezt fejezi ki százalékban -- megmutatja,
+mikor voltak a nagy esések és emelkedések.
+
+\bigskip
+
+\lbl{Feladat:}
+Az előző prompt folytatásaként kérd meg a Geminit a napi hozam
+kiszámítására és megjelenítésére!
+
+\begin{prompt}[Javasolt prompt]
+Az előző kód folytatásaként számítsd ki a napi százalékos hozamot
+a Close oszlopból, és jelenítsd meg ugyanolyan stílusban.
+Legyen cím és tengelyfeliratok.
+\end{prompt}
+
+\medskip\lbl{Módosítás -- statisztikák kiemelése!}
+
+\begin{prompt}[Módosító prompt]
+Módosítsd az előző kódot úgy, hogy a diagramon látszódjon:
+- A legjobb és legrosszabb nap (pont + felirat a dátumal és értékkel)
+- Egy vízszintes vonal a napi hozamok átlagánál
+\end{prompt}
+
+\bigskip
+
+%--- 3. feladat: kumulált hozam ---
+\subsection{3. feladat -- Kumulált hozam}
+
+\noindent A kumulált hozam megmutatja: ha 2020 elején 1000 dollárt fektettél volna be,
+ma mennyi lenne? Ezt a részvényre és az S\&P~500 indexre egyszerre vizualizáljuk --
+így azonnal látszik, túlteljesítette-e a részvény a piacot.
+
+\begin{itemize}[noitemsep, topsep=4pt]
+  \item Ha a részvény vonala az index felett van $\rightarrow$ jobban teljesített a piacnál
+  \item Ha alatta $\rightarrow$ egyszerűbb lett volna indexalapba fektetni
+\end{itemize}
+
+\bigskip
+
+\lbl{Feladat:}
+Fogalmazz meg egy promptot a Gemini számára mindkét eszköz kumulált hozamának
+megjelenítéséhez!
+
+\begin{prompt}[Javasolt prompt]
+Az előző kód folytatásaként számítsd ki és jelenítsd meg a df és a df_index
+kumulált hozamát egy diagramon, 1000 dolláros kezdőértékkel.
+Legyen cím, tengelyfeliratok (y: Portfólió értéke USD) és jelmagyarázat.
+\end{prompt}
+
+\note{Ha valaki szeretné tudni a pontos végösszeget: kérd meg a Geminit, hogy
+írja ki szövegesen is -- "1000 dollárból X lett a részvénnyel, Y az indexszel."}
+
+\bigskip\noindent\rule{\linewidth}{0.4pt}\bigskip
+
+%=============================================================
+\section{2. RÉSZ -- FinBERT sentiment elemzés}
+%=============================================================
+
+\noindent\textit{Cél: Egy pénzügyi szövegekre finomhangolt nyelvi modell (FinBERT)
+segítségével megvizsgáljuk, hogy az Apple-hez kapcsolódó hírek pozitív,
+negatív vagy semleges hangulatot közvetítenek-e -- majd összevetjük az árfolyammal.}
+
+\bigskip
+
+\subsection{0. lépés -- Telepítés és modell betöltése}
+
+\noindent Futtasd le sorban a notebook következő celláit:
+
+\begin{enumerate}[noitemsep, topsep=4pt]
+  \item \textbf{Telepítés / modell betöltés} -- a FinBERT modell letöltése és betöltése
+  \item \textbf{Hírek betöltése} -- az \texttt{AAPL\_hirek.csv} fájl beolvasása
+\end{enumerate}
+
+\warn{A FinBERT modell (~400 MB) az első futtatáskor letöltodik a Hugging Face szervereiről.
+Ez 1--2 percet vehet igénybe -- ez normális, csak egyszer kell letölteni!
+A \texttt{AAPL\_hirek.csv} fájlt töltsd fel a Colab session-be a bal oldali fájlkezelőn keresztül.}
+
+\bigskip
+
+\subsection{1. feladat -- Sentiment elemzés futtatása}
+
+\noindent A FinBERT minden hírhez három értéket ad: \textit{positive},
+\textit{negative}, \textit{neutral} -- és mindegyikhez egy 0--1 közötti valószínűségi score-t.
+A domináns sentiment az, amelyik a legnagyobb értékkel bír.
+
+\bigskip
+
+\lbl{Feladat:}
+Fogalmazz meg egy promptot a Gemini számára, amely lefuttatja
+a FinBERT elemzést az összes hírre!
+
+\begin{prompt}[Javasolt prompt]
+Te egy Python NLP szakértő vagy.
+### Feladat
+Írj kódot, amely a FinBERT modellel meghatározza minden hír
+sentiment-jét és score-ját.
+### Formátum
+Az eredményt add hozzá a hirek DataFrame-hez:
+- sentiment oszlop: "positive", "negative" vagy "neutral"
+- score oszlop: a domináns sentiment valószínűsége (0-1)
+### Kontextus
+- hirek egy pandas DataFrame, date és headline oszlopokkal
+- tokenizer és model már be van töltve (ProsusAI/finbert)
+- A modell kimenetének sorrendje: positive, negative, neutral
+\end{prompt}
+
+\bigskip
+
+\subsection{2. feladat -- Eredmények táblázatban}
+
+\noindent Ha megvan a sentiment minden hírhez, jelenítsük meg
+áttekinthető formában -- helyesen azonosítja-e a FinBERT
+a pozitív és negatív híreket?
+
+\bigskip
+
+\lbl{Feladat:}
+
+\begin{prompt}[Javasolt prompt]
+Az előző kód folytatásaként jelenítsd meg a hirek DataFrame-et
+táblázatban: dátum, hír címe, sentiment és score oszlopokkal.
+A negatív sorokat emeld ki pirossal, a pozitívokat zölddel.
+\end{prompt}
+
+\tip{Ellenőrizd: a COVID-hírek (2020 február--március) negatívak,
+a rekord bevételi bejelentések pozitívak? Ha igen, a modell jól működik.}
+
+\bigskip
+
+\subsection{3. feladat -- Top 5 legpozitívabb és legnegatívabb hír}
+
+\noindent Melyik hír kapta a legmagasabb pozitív score-t?
+Melyik a legnegatívabbat? Ez a két lista sokat elárul arról,
+hogyan látja a modell az Apple híreit.
+
+\bigskip
+
+\lbl{Feladat:}
+
+\begin{prompt}[Javasolt prompt]
+Az előző kód folytatásaként jelenítsd meg a top 5 legpozitívabb
+és top 5 legnegatívabb hírt két külön táblázatban, score szerint rendezve.
+\end{prompt}
+
+\bigskip
+
+\subsection{4. feladat -- Sentiment megoszlás}
+
+\noindent Összességében hogyan oszlanak meg a hírek?
+Több pozitív vagy negatív hír jelent meg az Apple-ről 2020--2024 között?
+
+\bigskip
+
+\lbl{Feladat:}
+
+\begin{prompt}[Javasolt prompt]
+Az előző kód folytatásaként készíts kördiagramot
+a sentiment kategóriák (positive/negative/neutral) megoszlásáról.
+\end{prompt}
+
+\bigskip
+
+\subsection{5. feladat -- Hírek az árfolyamon}
+
+\noindent Az utolsó vizualizáció: minden hír megjelenik az árfolyam
+diagramon egy pontként -- zölddel a pozitív, pirossal a negatív híreket jelölve.
+Vizuálisan látszik-e hogy a negatív hírek esések közelében vannak?
+
+\warn{55 hírből statisztikai korrelációt számolni nem lenne megbízható.
+Amit viszont látunk: a FinBERT helyesen azonosítja a negatív és pozitív híreket --
+ez önmagában is értékes eredmény. Megbízható korreláció számításhoz
+több száz hír kellene egyenletes időbeli elosztással.}
+
+\bigskip
+
+\lbl{Feladat:}
+
+\begin{prompt}[Javasolt prompt]
+Az előző kód folytatásaként jelenítsd meg az AAPL árfolyamát (df Close oszlop)
+és rajzold rá a híreket pontként az árfolyam értékén:
+zöld pont = positive, piros pont = negative, szürke pont = neutral.
+Legyen jelmagyarázat és cím.
+\end{prompt}
+
+\note{Próbáld meg értelmezni együtt a diagramot: a 2020 februári
+negatív hírek az árfolyamesés előtt vagy után jelennek meg?
+Mit látunk 2023-ban a Berkshire-eladások idején?}
+
+\bigskip\noindent\rule{\linewidth}{0.4pt}\bigskip
+
+%=============================================================
+\section{3. RÉSZ -- Kereskedési stratégia}
+%=============================================================
+
+\noindent\textit{Cél: Mozgóátlag alapú kereskedési stratégiát építünk,
+backtesteljük a 2020--2024-es időszakra, és összehasonlítjuk
+az egyszerű buy \& hold megközelítéssel.}
+
+\bigskip
+
+\subsection{0. lépés -- Technikai indikátorok}
+
+\noindent Futtasd le a notebook következő celláját -- ez kiszámítja
+az 50 és 200 napos mozgóátlagot és megjeleníti az árfolyamon.
+
+\medskip
+\noindent Az \textbf{50 napos mozgóátlag} a rövid távú trendet mutatja,
+a \textbf{200 napos} a hosszú távú irányt. Ha a rövid átlag átlép
+a hosszú fölé, az emelkedő trendet jelez -- és fordítva.
+
+\bigskip
+
+\subsection{1. feladat -- Kereskedési jelzések}
+
+\noindent A két mozgóátlag keresztezési pontjai adják a kereskedési jelzéseket:
+
+\begin{itemize}[noitemsep, topsep=4pt]
+  \item \textbf{Golden cross} -- az MA50 átlép az MA200 fölé $\rightarrow$ vételi jel
+  \item \textbf{Death cross} -- az MA50 átlép az MA200 alá $\rightarrow$ eladási jel
+\end{itemize}
+
+\bigskip
+
+\lbl{Feladat:}
+Fogalmazz meg egy promptot a Gemini számára, amely meghatározza
+a keresztezési pontokat és megjeleníti őket az árfolyamon!
+
+\begin{prompt}[Javasolt prompt]
+Az előző kód folytatásaként azonosítsd a golden cross és death cross
+pontokat a df DataFrame MA50 és MA200 oszlopai alapján.
+Jelenítsd meg az árfolyamot a mozgóátlagokkal együtt,
+és jelöld a golden cross pontokat zöld felfelé mutató háromszöggel,
+a death cross pontokat piros lefelé mutató háromszöggel.
+\end{prompt}
+
+\bigskip
+
+\subsection{2. feladat -- Backtesting}
+
+\noindent Ha 2020 elején 1000 dollárral indultunk és minden jelzésnél
+vettünk/eladtunk, mennyit ér most a portfóliónk?
+
+\bigskip
+
+\lbl{Feladat:}
+
+\begin{prompt}[Javasolt prompt]
+Az előző kód folytatásaként szimulálj egy egyszerű backtestet
+1000 dolláros kezdőtőkével:
+- Golden cross-nál: teljes tőkével vétel
+- Death cross-nál: teljes pozíció eladása
+Számítsd ki és írd ki a végső portfólió értékét.
+\end{prompt}
+
+\tip{Ha a stratégia rosszabbul teljesített mint a buy \& hold,
+ez is értékes eredmény -- megmutatja hogy a mozgóátlag stratégia
+nem mindig veri meg a piacot. Ez a valóságban is így van!}
+
+\bigskip
+
+\subsection{3. feladat -- Stratégia vs. Buy \& Hold}
+
+\noindent Az utolsó vizualizáció: hogyan alakult a portfólió értéke időben --
+a mozgóátlag stratégiával és az egyszerű buy \& hold megközelítéssel.
+
+\bigskip
+
+\lbl{Feladat:}
+
+\begin{prompt}[Javasolt prompt]
+Az előző kód folytatásaként jelenítsd meg egy diagramon
+a mozgóátlag stratégia és a buy \& hold portfólió értékét időben,
+1000 dolláros kezdőtőkéről indulva.
+Legyen cím, tengelyfeliratok (y: Portfólió értéke USD) és jelmagyarázat.
+\end{prompt}
+
+\note{Gondolkozzatok együtt: mikor teljesít jól a mozgóátlag stratégia?
+Erősen trendelő piacokon igen -- oldalazó vagy hirtelen forduló piacokon kevésbé.
+Az Apple 2020--2024 között erősen emelkedő trend volt -- ez kedvez a buy \& hold-nak.}
+
+\bigskip
+
+\subsection{4. feladat -- Módosítás: más paraméterek}
+
+\noindent A stratégia eredménye erősen függ a választott paraméterektől.
+Mi történik ha rövidebb mozgóátlagokat használunk?
+
+\bigskip
+
+\lbl{Módosító prompt:}
+
+\begin{prompt}[Módosító prompt]
+Módosítsd az előző kódot úgy, hogy MA20 és MA50 paramétereket
+használjon MA50 és MA200 helyett.
+Futtasd újra a backtestet és írd ki az új végső portfólió értékét.
+\end{prompt}
+
+\note{Rövidebb paraméterek = több jelzés, gyorsabb reakció, de több hamis jelzés is.
+Hosszabb paraméterek = kevesebb jelzés, lassabb reakció, de megbízhatóbb trend.}
+
+\bigskip\noindent\rule{\linewidth}{0.4pt}\bigskip
+
+%=============================================================
+\newpage
+\section*{Cheat Sheet -- Vibe coding alapok}
+%=============================================================
+
+\begin{tcolorbox}[cheatstyle, title={A vibe coding lépései}]
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\textbf{1. Értsd meg a feladatot} & Mi az input? Mi az elvárt output? \\[3pt]
+\textbf{2. Írd meg a promptot} & RTFC módszertan -- szerep, feladat, formátum, kontextus \\[3pt]
+\textbf{3. Futtasd a kódot} & Másold be a Colab cellába, futtasd le \\[3pt]
+\textbf{4. Értékeld az eredményt} & Helyes? Érthető? Szép? \\[3pt]
+\textbf{5. Iterálj} & Ha nem jó, pontosítsd a promptot -- ne a kódot \\
+\end{tabularx}
+\end{tcolorbox}
+
+\smallskip
+
+\begin{tcolorbox}[cheatstyle, title={Hasznos prompt kiegészítések kódgeneráláshoz}]
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\textit{"Magyarázd el a kódot röviden."} & Értsd meg amit futtatsz \\[3pt]
+\textit{"Adj hozzá kommenteket."} & Olvashatóbb kód \\[3pt]
+\textit{"A df változó neve ne változzon."} & Konzisztencia a notebookban \\[3pt]
+\textit{"Ne importálj új csomagokat."} & Ha már telepítve van minden \\[3pt]
+\textit{"Hibaüzenetet kaptam: [ide másold be]. Javítsd ki."} & Hibakeresés \\
+\end{tabularx}
+\end{tcolorbox}
+
+\smallskip
+
+\begin{tcolorbox}[cheatstyle, title={Notebook paraméterek -- gyors változtatás}]
+\begin{tabular}{@{}ll@{}}
+\texttt{TICKER = "MSFT"}        & Microsoft \\[2pt]
+\texttt{TICKER = "TSLA"}        & Tesla \\[2pt]
+\texttt{TICKER = "NVDA"}        & NVIDIA \\[2pt]
+\texttt{TICKER = "\^{}GSPC"}    & S\&P 500 index \\[2pt]
+\texttt{KEZDO\_DATUM = "2022-01-01"} & Csak a legutóbbi 3 év \\
+\end{tabular}
+\end{tcolorbox}
+
+\smallskip
+
+\begin{tcolorbox}[warnstyle]
+\textbf{\textcolor{warnborder}{Fontos:}}
+Ez az elemzés kizárólag oktatási célokat szolgál.
+A modellek által generált előrejelzések és kereskedési jelzések
+nem minősülnek befektetési tanácsnak.
+A valós befektetési döntésekhez mindig konzultálj szakértővel.
+\end{tcolorbox}
+
+\vfill
+\begin{center}
+\small\textcolor{medgray}{Sapientia EMTE \textbullet{} Generatív AI és üzleti alkalmazások \textbullet{} 2026}
+\end{center}
+
+\end{document} 

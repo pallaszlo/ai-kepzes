@@ -1,0 +1,32 @@
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.synctex
+*.synctex.gz
+*.listing
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.blg
+*.bbl
+*.bcf
+*.run.xml
+*.nav
+*.snm
+*.vrb
+
+# LaTeX output in latex subdirectories
+**/latex/*.pdf
+
+# Root LaTeX output
+/Feladatlap.pdf
+
+# Megoldás notebookok (egyelőre nem publikus)
+03_reszveny_elemzes/AI_alapu_reszvenyelemzes_megoldas.ipynb
+04_airbnb_elemzes/airbnb_elemzes_megoldas.ipynb
+
+# Claude Code
+.claude/

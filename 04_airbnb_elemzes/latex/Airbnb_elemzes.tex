@@ -1,0 +1,560 @@
+% !TEX encoding = UTF-8 Unicode
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable, skins, listings}
+
+\geometry{a4paper, top=2.2cm, bottom=2.2cm, left=2.5cm, right=2.5cm}
+
+\definecolor{accentblue}{RGB}{30, 80, 160}
+\definecolor{promptbg}{RGB}{242, 244, 248}
+\definecolor{promptborder}{RGB}{30, 80, 160}
+\definecolor{warnbg}{RGB}{255, 248, 235}
+\definecolor{warnborder}{RGB}{190, 80, 0}
+\definecolor{tipbg}{RGB}{240, 248, 240}
+\definecolor{tipborder}{RGB}{50, 130, 60}
+\definecolor{darkgray}{RGB}{70, 70, 70}
+\definecolor{medgray}{RGB}{130, 130, 130}
+\definecolor{cheatbg}{RGB}{250, 250, 252}
+\definecolor{cheatborder}{RGB}{30, 80, 160}
+\definecolor{labelcolor}{RGB}{40, 40, 100}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{medgray}{Airbnb európai szálláshelyek elemzése}}
+\fancyhead[R]{\small\textcolor{medgray}{Sapientia EMTE -- dr.\ Pál László}}
+\fancyfoot[C]{\small\textcolor{medgray}{\thepage}}
+\renewcommand{\headrulewidth}{0.3pt}
+
+\titleformat{\section}{\large\bfseries\color{accentblue}}{\thesection}{0.6em}{}%
+  [\vspace{-2pt}\textcolor{accentblue}{\rule{\linewidth}{0.6pt}}]
+\setcounter{secnumdepth}{0}
+\titleformat{\subsection}{\normalsize\bfseries\color{darkgray}}{}{0em}{}
+\titlespacing{\section}{0pt}{18pt}{8pt}
+\titlespacing{\subsection}{0pt}{12pt}{4pt}
+
+\lstdefinestyle{promptlst}{
+  basicstyle=\small\ttfamily\color{black},
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=none,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  literate=
+    {á}{{\'{a}}}1 {é}{{\'{e}}}1 {í}{{\'{i}}}1 {ó}{{\'{o}}}1 {ö}{{\"o}}1
+    {ő}{{\H{o}}}1 {ú}{{\'{u}}}1 {ü}{{\"u}}1 {ű}{{\H{u}}}1
+    {Á}{{\'{A}}}1 {É}{{\'{E}}}1 {Í}{{\'{I}}}1 {Ó}{{\'{O}}}1 {Ö}{{\"O}}1
+    {Ő}{{\H{O}}}1 {Ú}{{\'{U}}}1 {Ü}{{\"U}}1 {Ű}{{\H{U}}}1,
+}
+
+\tcbset{
+  promptstyle/.style={
+    breakable, enhanced,
+    colback=promptbg, colframe=promptborder,
+    boxrule=1pt, arc=3pt,
+    left=10pt, right=10pt, top=10pt, bottom=8pt,
+    attach boxed title to top left={xshift=10pt, yshift=-\tcboxedtitleheight/2},
+    boxed title style={
+      colback=promptborder, colframe=promptborder,
+      arc=2pt, boxrule=0pt,
+      left=6pt, right=6pt, top=2pt, bottom=2pt
+    },
+    coltitle=white, fonttitle=\footnotesize\bfseries\sffamily,
+  },
+  warnstyle/.style={
+    breakable, colback=warnbg, colframe=warnborder,
+    boxrule=0.5pt, leftrule=3pt, arc=2pt,
+    left=8pt, right=8pt, top=5pt, bottom=5pt,
+    fontupper=\small\sffamily,
+  },
+  tipstyle/.style={
+    breakable, colback=tipbg, colframe=tipborder,
+    boxrule=0.5pt, leftrule=3pt, arc=2pt,
+    left=8pt, right=8pt, top=5pt, bottom=5pt,
+    fontupper=\small\sffamily,
+  },
+  cheatstyle/.style={
+    breakable, enhanced, colback=cheatbg, colframe=cheatborder,
+    boxrule=0.8pt, arc=3pt,
+    left=10pt, right=10pt, top=9pt, bottom=7pt,
+    attach boxed title to top left={xshift=10pt, yshift=-\tcboxedtitleheight/2},
+    boxed title style={
+      colback=cheatborder, colframe=cheatborder,
+      arc=2pt, boxrule=0pt,
+      left=6pt, right=6pt, top=2pt, bottom=2pt
+    },
+    coltitle=white, fonttitle=\footnotesize\bfseries\sffamily,
+  },
+}
+
+\newtcblisting{prompt}[1][Prompt]{
+  promptstyle, title=#1,
+  listing only,
+  listing options={style=promptlst},
+}
+
+\newcommand{\warn}[1]{%
+  \vspace{3pt}%
+  \begin{tcolorbox}[warnstyle]%
+  \textbf{\textcolor{warnborder}{Figyelem:}} #1%
+  \end{tcolorbox}\vspace{2pt}}
+
+\newcommand{\tip}[1]{%
+  \vspace{3pt}%
+  \begin{tcolorbox}[tipstyle]%
+  \textbf{\textcolor{tipborder}{Tipp:}} #1%
+  \end{tcolorbox}\vspace{2pt}}
+
+\newcommand{\lbl}[1]{\vspace{6pt}\noindent{\small\bfseries\textcolor{labelcolor}{#1}}\par\smallskip}
+
+\hypersetup{colorlinks=true, linkcolor=accentblue, urlcolor=accentblue}
+
+\begin{document}
+
+\thispagestyle{empty}
+\begin{center}
+  {\LARGE\bfseries Airbnb európai szálláshelyek elemzése}\\[5pt]
+  {\normalsize Generatív AI és alkalmazások modul}\\[1pt]
+  {\small\color{medgray} dr.\ Pál László, Sapientia EMTE, 2026. március 6--7.}
+\end{center}
+
+\vspace{10pt}
+\noindent
+\begin{tabularx}{\linewidth}{lXr}
+\toprule
+\textbf{Blokk} & \textbf{Tartalom} & \textbf{Időtartam} \\
+\midrule
+1.\ feladat    & Adatbetöltés & $\sim$10 perc \\
+1.5\ feladat   & EDA (Exploratory Data Analysis) -- adatfeltáró elemzés & $\sim$10 perc \\
+2--3.\ feladat & Alapstatisztikák, outlier szűrés, korreláció-heatmap & $\sim$20 perc \\
+4--5.\ feladat & KDE, összefüggés-vizsgálatok & $\sim$25 perc \\
+6.\ feladat    & K-means klaszterezés -- Budapest & $\sim$30 perc \\
+7.\ feladat    & Ár-előrejelzés -- Random Forest & $\sim$20 perc \\
+8.\ feladat    & Hasonló szállások ajánlója (opcionális) & $\sim$15 perc \\
+\midrule
+\multicolumn{2}{l}{\textbf{Teljes blokk}} & \textbf{$\sim$115 perc} \\
+\bottomrule
+\end{tabularx}
+
+\smallskip
+\noindent\textbf{Eszközök:} Google Colab + Gemini (\texttt{gemini.google.com})\\
+\noindent\textbf{Dataset:} \texttt{airbnb\_europe.csv}
+
+\vspace{8pt}
+
+\begin{tcolorbox}[warnstyle]
+\textbf{\textcolor{warnborder}{Oszlopnevek:}}
+Amikor Gemini-nek promptot írsz, mindig pontosan ezeket az oszlopneveket add meg
+(nagy/kis betű és szóközök számítanak):\\[4pt]
+\texttt{Price}, \texttt{City}, \texttt{Day}, \texttt{Room Type},
+\texttt{Superhost}, \texttt{Person Capacity}, \texttt{Cleanliness Rating},
+\texttt{Guest Satisfaction}, \texttt{Bedrooms},
+\texttt{City Center (km)}, \texttt{Metro Distance (km)},
+\texttt{Normalised Attraction Index}
+\end{tcolorbox}
+
+%=============================================================
+\section{1. feladat -- Adatbetöltés}
+%=============================================================
+
+\noindent\textit{Töltsd be az adatfájlt és vizsgáld meg az alapinformációkat.
+Az \texttt{airbnb\_europe.csv} fájlt töltsd fel a Colab session-be
+(bal oldali fájlkezelő -- feltöltés).}
+
+\begin{prompt}[Prompt -- adatbetöltés]
+Írj Python kódot Google Colab notebookban, amely:
+- Betölti az airbnb_europe.csv fájlt pandas DataFrame-be (df)
+- Kiírja a sorok és oszlopok számát
+- Megjeleníti az első 5 sort (df.head())
+- Kiírja az összes egyedi város nevét
+- Ellenőrzi és kiírja a hiányzó értékeket oszloponként
+\end{prompt}
+
+%=============================================================
+\section{1.5 feladat -- EDA (Exploratory Data Analysis) – adatfeltáró elemzés}
+%=============================================================
+
+\noindent\textit{Mielőtt bármit szűrünk vagy transzformálunk, nézzük meg, mit tartalmaz az adatbázis.
+Ez a két diagram megmutatja, miért lesz szükség outlier szűrésre és log-transzformációra a következő lépésekben.}
+
+\begin{prompt}[Prompt -- EDA vizualizáció]
+Írj Python kódot, amely:
+- Barplot: átlagos 'Price' városonként (sns.barplot, palette='Set3')
+  Rendezd csökkenő sorrendbe az átlagár szerint
+  Méret: 10x5, cím: 'Átlagos éjszakai ár városonként (EUR)'
+  x tengelyen forgatás: 30 fok
+- Hisztogram: a 'Price' oszlop nyers eloszlása (bins=60, color='steelblue')
+  Méret: 10x4, cím: 'Ár eloszlása (nyers adatok)'
+  x tengely felirat: 'Ár (EUR/éj)'
+
+Meglévő változó: df (pandas DataFrame)
+\end{prompt}
+
+\tip{A barplotból látszik, melyik városok drágábbak (pl.\ Amsterdam, Párizs vs.\ Budapest).
+A hisztogramból látszik az erős jobbra ferdülés -- néhány szálláshely extrém magas ára torzítja az egész képet.
+Ez magyarázza, miért kell majd outlier szűrés és log-transzformáció.}
+
+%=============================================================
+\section{2. feladat -- Alapstatisztikák és outlier szűrés}
+%=============================================================
+
+\noindent\textit{Vizsgáljuk meg az ár eloszlását és a leíró statisztikákat.
+Ha a \texttt{describe()} eredménye alapján extrém kiugró értékek láthatók,
+szűrjük ki őket egy megfelelő percentilis határral.}
+
+\begin{prompt}[Prompt -- outlier szűrés]
+Írj Python kódot, amely:
+- Kiírja a df.describe() eredményét (alapstatisztikák)
+- Rajzolja meg a 'Price' oszlop hisztogramját
+- Ha a hisztogram alapján szükséges, szűrje ki a kiugró
+  értékeket a 'Price' oszlopból egy megfelelő percentilis határral
+- Írja ki, hány sor maradt és mi volt a szűrési határ (EUR/éj)
+
+Meglévő változó: df (pandas DataFrame)
+Oszlopnév: 'Price'
+\end{prompt}
+
+\warn{Az outlier szűrés mértéke befolyásolja az összes
+eredményt -- a klaszterközéppontokat, a modell pontosságát és az
+ajánló kimenetét is.}
+
+%=============================================================
+\section{3. feladat -- Korreláció-heatmap}
+%=============================================================
+
+\noindent\textit{A heatmap megmutatja, melyik változók függnek össze egymással.
+Az értékek --1 és +1 között mozognak: a kék cellák pozitív, a piros cellák
+negatív összefüggést jeleznek.}
+
+\begin{prompt}[Prompt -- korreláció-heatmap]
+Írj Python kódot, amely elkészíti a korreláció-heatmapet:
+- Csak numerikus oszlopokat szerepeltess (df.select_dtypes)
+- sns.heatmap, annot=True, cmap='RdBu_r', vmin=-1, vmax=1
+- linewidths=0.5, linecolor='black'
+- Méret: 14x9
+- Cím: 'Korrelációs mátrix'
+
+Meglévő változó: df (szűrt DataFrame)
+\end{prompt}
+
+\tip{Figyeld meg a legerősebb összefüggéseket: \texttt{Cleanliness Rating}--\texttt{Guest Satisfaction} (0.69),
+\texttt{Person Capacity}--\texttt{Bedrooms} (0.56).
+Meglepetés: a \texttt{Price} és a \texttt{Guest Satisfaction} között nincs erős korreláció (0.02) --
+a drágább szállás nem jelent jobb élményt.
+Az \texttt{Attraction Index} és \texttt{Restaurant Index} változók egymással erősen korrelálnak (0.74--0.84):
+ugyanazt a jelenséget mérik különböző normalizálással.
+Ez a Random Forest feature importance-nál is látszani fog -- a ``szavazatok'' megoszlanak közöttük.}
+
+%=============================================================
+\section{4. feladat -- Ár eloszlás városonként (log-transzformáció)}
+%=============================================================
+
+\noindent\textit{A KDE (Kernel Density Estimation) egy simított hisztogram:
+folytonos görbével mutatja meg, hol sűrűsödnek az árak.
+Több város egyszerre jól összehasonlítható rajta.
+A nyers ár eloszlása miatt azonban a városok görbéi alig különböztethetők meg --
+néhány extrém drága szálláshely szétnyújtja a skálát.
+A log10-transzformáció összenyomja a nagy értékeket,
+így az eloszlások összehasonlíthatóvá válnak.
+Például: 100 EUR $\to$ 2.0, 1000 EUR $\to$ 3.0.}
+
+\begin{prompt}[Prompt -- log-transzformált KDE]
+Írj Python kódot, amely:
+- Létrehoz egy df_log másolatot a df-ből
+- A df_log['Price'] oszlopot felváltja np.log10(df['Price'])-vel
+- sns.displot KDE diagramot készít:
+  x='Price', hue='City', kind='kde', fill=True
+  height=6, aspect=1.8
+- Cím: 'Ár eloszlás városonként (log10 skála)'
+- x tengely felirat: 'log10(Ár)'
+
+Meglévő változók: df, df_log
+\end{prompt}
+
+\tip{A görbék csúcsa mutatja a leggyakoribb árkategóriát városonként:
+log10(2.0) = 100 EUR, log10(2.3) $\approx$ 200 EUR, log10(2.5) $\approx$ 316 EUR.
+Rome csúcsa a legszűkebb és legmagasabb -- az árak kevésbé szóródnak.
+Amsterdam és Paris görbéje jobbra tolódik és lapos -- drágább és változatosabb árszintű piac.
+Athens és Budapest balra helyezkedik -- jellemzően olcsóbb szállások.
+A 3.0 feletti értékek (1000 EUR+) minden városban ritkaságok,
+de Amsterdam esetén a legsűrűbbek.}
+
+%=============================================================
+\section{5. feladat -- Összefüggés-vizsgálatok (binning)}
+%=============================================================
+
+\noindent\textit{Három kérdést vizsgálunk boxplot diagramokkal.
+A binning technika a folytonos változókat (pl.\ távolság km-ben)
+kategóriákra osztja, így boxplottal vizualizálhatók.}
+
+\lbl{1.\ diagram -- Tisztaság és vendégelégedettség}
+
+\begin{prompt}[Prompt -- cleanliness vs. elégedettség]
+Írj Python kódot seaborn boxplothoz:
+- x='Cleanliness Rating', y='Guest Satisfaction'
+- palette='Set3', width=0.7, whis=5
+- Méret: 12x5
+- Cím: 'Tisztaság hatása a vendégelégedettségre'
+
+Meglévő változó: df
+Oszlopnevek: 'Cleanliness Rating', 'Guest Satisfaction'
+\end{prompt}
+
+\lbl{2.\ diagram -- Városközponttól való távolság és ár}
+
+\begin{prompt}[Prompt -- távolság vs. ár]
+Írj Python kódot, amely:
+- pd.cut segítségével a 'City Center (km)' oszlopot
+  kategóriákra osztja: 0-3, 3-6, 6-9, ..., 24-27 km
+- Menti a df['dist_bin'] oszlopba
+- sns.boxplot: x='dist_bin', y=np.log10(df['Price'])
+  palette='Set3', width=0.7
+- Méret: 12x5, x tengelyen 30 fokos forgatás
+- Cím: 'Városközpont távolsága vs. ár (log10)'
+
+Meglévő változók: df, df_log
+Oszlopnevek: 'City Center (km)', 'Price'
+\end{prompt}
+
+\lbl{3.\ diagram -- Vendégelégedettség és ár}
+
+\begin{prompt}[Prompt -- elégedettség vs. ár]
+Írj Python kódot, amely:
+- pd.cut segítségével a 'Guest Satisfaction' oszlopot
+  10-es lépésekkel osztja kategóriákra: 0-10, 10-20, ..., 90-100
+- Menti a df['sat_bin'] oszlopba
+- sns.boxplot: x='sat_bin', y=np.log10(df['Price'])
+  palette='Set3', width=0.7
+- Méret: 12x5
+- Cím: 'Vendégelégedettség vs. ár (log10)'
+
+Meglévő változók: df, df_log
+\end{prompt}
+
+\tip{1.\ diagram: egyértelmű összefüggés -- a tisztább szálláshely magasabb vendégelégedettséggel jár.
+2.\ diagram: az ár a városközponttól távolodva enyhe csökkenést mutat, de a különbség kisebb a vártnál --
+log10(2.3) $\approx$ 200 EUR vs.\ log10(2.2) $\approx$ 158 EUR.
+A 21--24 km-es kategória kilóg: valószínűleg repülőtér-közeli szállások emelik az átlagot.
+3.\ diagram: a \texttt{Guest Satisfaction} és az ár között nincs érdemi összefüggés --
+a drágább szállás nem jelent jobb értékelést, és fordítva sem.}
+
+%=============================================================
+\section{6. feladat -- K-means klaszterezés (Budapest)}
+%=============================================================
+
+\noindent\textit{A K-means tanítás nélküli (unsupervised) algoritmus: előre megcímkézett adat nélkül fedez fel
+csoportokat a hasonlóságok alapján. Egyszerre veszi figyelembe az összes változót -- ár, távolság,
+elégedettség, hálószobák száma stb. -- így üzleti szegmensek azonosíthatók (pl.\ budget, prémium,
+nagy kapacitású). A folytonos változókat standardizálni kell, mert eltérő skálán vannak;
+a kategorikus oszlopokat one-hot encodinggal bináris (0/1) értékekké alakítjuk.}
+
+\subsection{6.1 -- Adatelőkészítés és elbow method}
+
+\begin{prompt}[Prompt -- Budapest szűrés és elbow]
+Írj Python kódot, amely:
+- Szűri a budapesti adatokat: df_bp = df[df['City'] == 'Budapest'].copy()
+- One-hot encoding a kategorikus oszlopokra (pd.get_dummies)
+- Bool oszlopokat int8-ra konvertál
+- StandardScaler-rel standardizálja a numerikus oszlopokat (X_scaled)
+- Elbow method: KMeans K=2..15, inertia értékeket gyüjt és kirajzolja
+  x='k', y='Inertia', marker='o'
+- Cím: 'Elbow method -- optimális K meghatározása'
+
+Meglévő változó: df
+\end{prompt}
+
+\warn{Ennél a görbénél nincs éles törés -- ez tipikus. K=4 és K=6 között érdemes kísérletezni:
+futtasd le mindkettőt és azt válaszd, amelyik klaszterprofil üzletileg értelmesebb
+(pl.\ budget, prémium, nagy kapacitású szegmens).}
+
+\subsection{6.2 -- Klaszterezés és PCA vizualizáció}
+
+\noindent\textit{A PCA (Principal Component Analysis) az összes változó információját sűríti 2 dimenzióba,
+hogy vizualizálható legyen. A tengelyértékek önmagukban nem értelmezhetők -- csak a pontok
+egymáshoz viszonyított távolsága számít: a közel lévő pontok hasonló jellemzőjű szállásokat jelentenek.
+Az a lényeg, hogy a \textbf{színek szétválnak-e}: ez jelzi, hogy az algoritmus valódi csoportokat talált.}
+
+\begin{prompt}[Prompt -- K-means és PCA]
+Írj Python kódot, amely:
+- KMeans(n_clusters=5, n_init='auto', random_state=42) futtat X_scaled-en
+- A klaszter labeleket hozzáadja df_bp['cluster'] oszlopként
+- Kiírja a klaszter profilokat: csoportonkénti átlagok
+  'Price', 'Guest Satisfaction', 'City Center (km)', 'Bedrooms' oszlopokra
+- PCA(n_components=2) projekció, scatter plot klaszterszín szerint
+  (cmap='tab10', s=20, alpha=0.7)
+- Cím: 'Budapesti szállások klaszterei (PCA projekció)'
+
+Meglévő változók: df_bp, X_scaled
+\end{prompt}
+
+\tip{A profilok üzleti szegmenseket mutatnak: a legdrágább, legjobb elhelyezkedésű klaszter a prémium szegmens,
+a magas távolság + alacsony ár kombináció a budget külvárosi szegmens,
+a nagy tömegű középső klaszterek különböző árszintű átlagos szállásokat jelentenek.
+A PCA diagramon a színek szétválása megerősíti, hogy az algoritmus valódi csoportokat talált.}
+
+%=============================================================
+\section{7. feladat -- Ár-előrejelzés (Random Forest, Budapest)}
+%=============================================================
+
+\noindent\textit{A Random Forest döntési fák sokaságából álló ensemble modell.
+Most arra tanítjuk, hogy a szálláshely jellemzői alapján megjósolja az árat.
+A feature importance megmutatja, melyik változó befolyásolja leginkább az árat.}
+
+\subsection{7.1 -- Modell tanítása és értékelése}
+
+\begin{prompt}[Prompt -- Random Forest modell]
+Írj Python kódot, amely:
+- df_bp-ből a célváltozó: y = df_bp['Price']
+- Feature-ök: X = df_bp összes többi numerikus oszlopa
+- Train/test split: 80/20, random_state=42
+- RandomForestRegressor(n_estimators=500, random_state=42, n_jobs=-1)
+- Kiírja Train és Test MAE, RMSE, R2 értékeket
+- Top 15 feature importance vízszintes barplot
+  Cím: 'Top 15 -- mi határozza meg az árat Budapesten?'
+
+Meglévő változók: df_bp (one-hot kódolt DataFrame)
+\end{prompt}
+
+\tip{Test R²=0.60: a modell az árvarianciának 60\%-át magyarázza --
+a maradék 40\% olyan tényezőktől függ, amelyek nincsenek az adatban
+(fotók minősége, leírás stílusa, gazda válaszkészsége).
+A Train/Test R² különbség (0.91 vs.\ 0.60) túlilleszkedést jelez.
+
+Feature importance: az elhelyezkedés (\texttt{Metro Distance}, \texttt{City Center}) dominálja az árat --
+ez összhangban van az 5.\ feladat boxplot eredményeivel.
+Az \texttt{Attraction} és \texttt{Restaurant} indexek együtt $\sim$40\%-ot tesznek ki:
+pontosan a 3.\ feladatnál jelzett szavazatmegoszlás.
+Az EDA-ban látott összefüggések tehát visszaigazolódnak a gépi tanulási modellben.}
+
+%=============================================================
+\section{8. feladat -- Hasonló szállások ajánlója \textnormal{\small(opcionális)}}
+%=============================================================
+
+\noindent\textit{Ez a feladat opcionális -- ha az idő engedi, vagy házi projektként. Elvégzése nem feltétele a többi feladatnak.}
+
+\smallskip
+\noindent A \textbf{cosine similarity} két vektor közötti szög koszinuszát méri.
+Ha két szálláshely numerikus jellemzői hasonlók,
+a köztük lévő szög kicsi -- a hasonlóság értéke 1-hez közelít.
+Az ajánló az összes városra dolgozik, így előfordulhat,
+hogy egy budapesti szálláshely mellé bécsi kerül -- ez nem hiba,
+hanem az azonos ár-érték profil következménye.
+
+\begin{tcolorbox}[tipstyle]
+\textbf{\textcolor{tipborder}{Továbbfejlesztés -- beágyazásos ajánló (embedding-alapú):}}
+A mostani megközelítés numerikus jellemzőkön dolgozik (ár, távolság stb.).
+A modern ajánlórendszerek ennél tovább mennek: a szálláshely szöveges leírásából
+nyelvi modell segítségével \textbf{beágyazási vektorokat} (embeddings) generálnak,
+és a szemantikai hasonlóságot mérik -- nem csak a számokat.
+Ehhez pl.\ a \texttt{sentence-transformers} könyvtár használható Colabon,
+API kulcs nélkül (\texttt{paraphrase-multilingual-MiniLM} modell).
+Ez a házi projekt egyik lehetséges iránya.
+\end{tcolorbox}
+
+\begin{prompt}[Prompt -- cosine similarity ajánló]
+Írj Python kódot, amely felépíti a szállásajánlót:
+- df-ből válaszd ki ezeket a feature-öket:
+  'Price', 'Guest Satisfaction', 'City Center (km)',
+  'Bedrooms', 'Normalised Attraction Index', 'Metro Distance (km)'
+- StandardScaler standardizálás
+- Írj ajanlj(idx, top_n=5) függvényt, amely:
+  - cosine_similarity segítségével megkeresi a top_n
+    leghasonlóbb szállást (saját magát kizárva)
+  - Kiírja a referencia szállást és a top 5 ajánlást:
+    'City', 'Room Type', 'Price', 'City Center (km)',
+    'Guest Satisfaction', hasonlóság értéke
+- Teszteld egy budapesti és egy párizsi szállásra
+
+Szükséges import: from sklearn.metrics.pairwise import cosine_similarity
+Meglévő változó: df (teljes, 10 városos DataFrame)
+\end{prompt}
+
+\tip{Az ajánló városok között is keres -- egy budapesti prémium szállás mellé bécsi kerülhet,
+mert az ár-érték profiljuk hasonló. Ez a módszer korlátja is: csak a numerikus jellemzőket látja,
+a város karakterét, a nyelvet vagy a kulturális kontextust nem.
+Pontosan ezért mutat tovább az embedding-alapú megközelítés.}
+
+%=============================================================
+\newpage
+\section*{Cheat Sheet -- Airbnb elemzés}
+%=============================================================
+
+\begin{tcolorbox}[cheatstyle, title={Adatbetöltés és tisztítás}]
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\texttt{pd.read\_csv('airbnb\_europe.csv')} & fájl betöltése \\[2pt]
+\texttt{df.isnull().sum()} & hiányzó értékek \\[2pt]
+\texttt{df['Price'].quantile(0.99)} & 99.\ percentilis \\[2pt]
+\texttt{df[df['Price'] <= p99]} & outlier szűrés \\[2pt]
+\texttt{np.log10(df['Price'])} & log-transzformáció \\[2pt]
+\texttt{pd.cut(df[x], bins=..., labels=...)} & binning \\
+\end{tabularx}
+\end{tcolorbox}
+
+\smallskip
+
+\begin{tcolorbox}[cheatstyle, title={K-means klaszterezés -- lépések}]
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\textbf{1.} & Kategorikus oszlopok: \texttt{pd.get\_dummies} \\[2pt]
+\textbf{2.} & Standardizálás: \texttt{StandardScaler().fit\_transform(X)} \\[2pt]
+\textbf{3.} & Elbow: K=2..15, inertia görbe, keresd a töréspontot \\[2pt]
+\textbf{4.} & \texttt{KMeans(n\_clusters=K, n\_init='auto', random\_state=42)} \\[2pt]
+\textbf{5.} & Profilok: \texttt{df.groupby('cluster')[features].mean()} \\[2pt]
+\textbf{6.} & PCA vizualizáció: \texttt{PCA(n\_components=2)} \\
+\end{tabularx}
+\end{tcolorbox}
+
+\smallskip
+
+\begin{tcolorbox}[cheatstyle, title={Random Forest -- lépések}]
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\textbf{1.} & \texttt{train\_test\_split(X, y, test\_size=0.2)} \\[2pt]
+\textbf{2.} & \texttt{RandomForestRegressor(n\_estimators=500, n\_jobs=-1)} \\[2pt]
+\textbf{3.} & Metrikák: MAE, RMSE, R2 -- train és test halmazon \\[2pt]
+\textbf{4.} & \texttt{rf.feature\_importances\_} -- melyik változó számít? \\
+\end{tabularx}
+\end{tcolorbox}
+
+\smallskip
+
+\begin{tcolorbox}[cheatstyle, title={Cosine similarity ajánló (opcionális)}]
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\textbf{1.} & Feature-ök standardizálása \\[2pt]
+\textbf{2.} & \texttt{cosine\_similarity(matrix[i].reshape(1,-1), matrix)} \\[2pt]
+\textbf{3.} & Saját magát kizárjuk: \texttt{sim[idx] = 0} \\[2pt]
+\textbf{4.} & Top N: \texttt{sim.argsort()[::-1][:n]} \\[2pt]
+\textbf{+} & Továbbfejlesztés: \texttt{sentence-transformers} szöveges beágyazással \\
+\end{tabularx}
+\end{tcolorbox}
+
+\smallskip
+
+\begin{tcolorbox}[cheatstyle, title={Vibe coding -- hasznos promptminták}]
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\textit{Adatbetöltés} & \textit{``Írj kódot, amely betölti a CSV-t és kiírja az alapinformációkat''} \\[3pt]
+\textit{Vizualizáció} & \textit{``Adj hozzá tengelyfeliratot, címet és rácsozást''} \\[3pt]
+\textit{Hiba esetén} & \textit{``Ez a hibaüzenet jelent meg: [...] Javítsd ki''} \\[3pt]
+\textit{Finomítás} & \textit{``A diagram túl zsúfolt, csökkentsd a betűméretet''} \\[3pt]
+\textit{Magyarázat} & \textit{``Magyarázd el mit csinál ez a kódrészlet''} \\
+\end{tabularx}
+\end{tcolorbox}
+
+\vfill
+\begin{center}
+\small\textcolor{medgray}{Sapientia EMTE \textbullet{} Generatív AI és üzleti alkalmazások \textbullet{} 2026}
+\end{center}
+
+\end{document}
