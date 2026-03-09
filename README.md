@@ -20,8 +20,3 @@ Sapientia EMTE, dr. Pál László, 2026. március 6--7.
 
 1. Töltsd le vagy klónozd a repót: `git clone https://github.com/pallaszlo/ai-kepzes.git`
 2. Nyisd meg a `Feladatlap.pdf` fájlt és kövesd az utasításokat.
-
-## Google Classroom
-
-- Link: <https://classroom.google.com/u/0/c/ODQ1Njg1MjM4MDIw>
-- Kód: `lgwr5qh3`
