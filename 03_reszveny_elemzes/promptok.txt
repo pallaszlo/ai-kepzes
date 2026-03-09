@@ -1,0 +1,102 @@
+============================================================
+AI ALAPÚ RÉSZVÉNYELEMZÉS – PROMPTOK
+============================================================
+Ezeket a promptokat a Gemini-be kell beírni/bemásolni.
+A kapott kódot másold be a notebook megfelelő cellájába!
+============================================================
+
+
+------------------------------------------------------------
+3. ÁRFOLYAM VIZUALIZÁCIÓ
+------------------------------------------------------------
+
+Írj Python kódot, amely megjeleníti az AAPL részvény záróárfolyamát (Close oszlop) egy vonaldiagramon. A df DataFrame már be van töltve és tartalmazza az adatokat. Legyen cím, tengelyfeliratok, rács, és a méret legyen 14×5.
+
+
+------------------------------------------------------------
+3. MÓDOSÍTÁS – KRÍZIS IDŐSZAKOK KIEMELÉSE
+------------------------------------------------------------
+
+Módosítsd az előző kódot úgy, hogy kiemelje a következő időszakokat színes sávokkal (axvspan):
+- COVID-összeomlás: 2020-02-01 – 2020-06-01 (piros, alpha=0.15)
+- Ukrajna háború + kamatemelés: 2022-02-01 – 2022-12-31 (narancs, alpha=0.15)
+Legyen jelmagyarázat is.
+
+
+------------------------------------------------------------
+4. NAPI HOZAM
+------------------------------------------------------------
+
+Írj Python kódot, amely kiszámítja a df DataFrame Close oszlopából a napi hozamot százalékban (pct_change * 100), és megjeleníti egy vonaldiagramon. Méret: 14×4, cím, tengelyfeliratok, rács.
+
+
+------------------------------------------------------------
+4. MÓDOSÍTÁS – LEGJOBB/LEGROSSZABB NAP + ÁTLAG
+------------------------------------------------------------
+
+Módosítsd az előző kódot:
+- Jelöld meg a legjobb és legrosszabb napot egy-egy ponttal és felirattal (dátum + érték)
+- Húzz egy vízszintes vonalat a napi hozamok átlagánál (piros szaggatott vonal)
+
+
+------------------------------------------------------------
+5. KUMULÁLT HOZAM
+------------------------------------------------------------
+
+Írj Python kódot, amely kiszámítja és megjeleníti a kumulált hozamot 1000 dolláros kezdőtőkéről indulva. Jelenítsd meg egyszerre a részvényt (df) és az S&P 500 indexet (df_index) – mindkettő Close oszlopából. Legyen jelmagyarázat, cím, rács. Méret: 14×5.
+
+
+------------------------------------------------------------
+6.3 FINBERT SENTIMENT ELEMZÉS
+------------------------------------------------------------
+
+Írj Python kódot, amely a hirek DataFrame minden sorára (headline oszlop) lefuttatja a FinBERT sentiment elemzést. A tokenizer és model már be van töltve. Minden hírhez határozd meg a sentiment kategóriát (positive/negative/neutral) és a hozzá tartozó score-t. Az eredményt add hozzá a hirek DataFrame-hez két új oszlopként: sentiment és score.
+
+
+------------------------------------------------------------
+6.4 SENTIMENT EREDMÉNYEK TÁBLÁZATBAN
+------------------------------------------------------------
+
+Az előző kód folytatásaként jelenítsd meg a hirek DataFrame-et táblázatban: dátum, hír címe, sentiment és score oszlopokkal. A score legyen 4 tizedesjegyre kerekítve.
+
+
+------------------------------------------------------------
+6.5 TOP 5 LEGPOZITÍVABB ÉS LEGNEGATÍVABB HÍR
+------------------------------------------------------------
+
+Az előző kód folytatásaként jelenítsd meg a top 5 legpozitívabb és top 5 legnegatívabb hírt két külön táblázatban, score szerint rendezve. A pozitívaknál a legmagasabb score-t keresd, a negatívaknál a legalacsonyabbat.
+
+
+------------------------------------------------------------
+6.6 SENTIMENT MEGOSZLÁS KÖRDIAGRAM
+------------------------------------------------------------
+
+Az előző kód folytatásaként készíts kördiagramot (pie chart) a sentiment kategóriák megoszlásáról. Használj zöld, piros és szürke színeket. Legyen cím és százalékos felirat.
+
+
+------------------------------------------------------------
+6.7 HÍREK AZ ÁRFOLYAMON
+------------------------------------------------------------
+
+Az előző kód folytatásaként jelenítsd meg az AAPL záróárfolyamát (df Close oszlop) vonaldiagramon, és rajzold rá a híreket pontokként: zöld = pozitív, piros = negatív, szürke = semleges. A hirek DataFrame tartalmazza a date, headline, sentiment oszlopokat. A pontok y értékét az árfolyamból kell kiszámítani az adott dátumra. Legyen jelmagyarázat és cím. Méret: 14×6.
+
+
+------------------------------------------------------------
+7.2 KERESKEDÉSI JELZÉSEK
+------------------------------------------------------------
+
+Írj Python kódot, amely meghatározza a golden cross és death cross pontokat a df DataFrame MA50 és MA200 oszlopai alapján. Golden cross: MA50 átlép MA200 fölé. Death cross: MA50 átlép MA200 alá. Jelenítsd meg az árfolyamot a mozgóátlagokkal, és jelöld a golden cross-okat zöld felfelé mutató háromszöggel, a death cross-okat piros lefelé mutató háromszöggel. Méret: 14×6, legyen jelmagyarázat.
+
+
+------------------------------------------------------------
+7.3 BACKTESTING
+------------------------------------------------------------
+
+Az előző kód folytatásaként szimulálj egy egyszerű backtestet. 1000 dolláros kezdőtőkével indulunk: minden golden cross-nál veszünk (teljes tőkéért részvényt), minden death cross-nál eladunk (teljes pozíciót). Számítsd ki a végső portfólió értékét, írd ki a tranzakciók számát és a teljes hozamot százalékban.
+
+
+------------------------------------------------------------
+7.4 STRATÉGIA VS. BUY & HOLD
+------------------------------------------------------------
+
+Az előző kód folytatásaként jelenítsd meg egy diagramon a mozgóátlag stratégia és a buy & hold portfólió értékét időben, mindkettő 1000 dolláros kezdőtőkéről indulva. Legyen cím, tengelyfeliratok, jelmagyarázat és rács. Méret: 14×5.

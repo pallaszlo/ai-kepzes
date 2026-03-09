@@ -1,0 +1,112 @@
+============================================================
+AIRBNB EURÓPAI SZÁLLÁSHELYEK ELEMZÉSE – PROMPTOK
+============================================================
+Ezeket a promptokat a Gemini-be kell beírni/bemásolni.
+A kapott kódot másold be a notebook megfelelő cellájába!
+============================================================
+
+
+------------------------------------------------------------
+2. ADATBETÖLTÉS ÉS ALAPINFORMÁCIÓK
+------------------------------------------------------------
+
+Írj Python kódot, amely betölti az airbnb_europe.csv fájlt egy df nevű pandas DataFrame-be. Írd ki a sorok és oszlopok számát, jelenítsd meg az első 5 sort, írd ki az összes egyedi város nevét, és ellenőrizd a hiányzó értékeket oszloponként.
+
+
+------------------------------------------------------------
+2.5 GYORS EDA – ÁTLAGÁRAK ÉS ÁR ELOSZLÁS
+------------------------------------------------------------
+
+Írj Python kódot, amely két diagramot készít a df DataFrame-ből:
+1. Barplot: átlagos Price városonként, csökkenő sorrendben, palette='Set3', méret 10×5, legyen cím
+2. Hisztogram: a Price nyers eloszlása, bins=60, méret 10×4, legyen cím
+
+
+------------------------------------------------------------
+3. ALAPSTATISZTIKÁK ÉS OUTLIER SZŰRÉS
+------------------------------------------------------------
+
+Írj Python kódot, amely a df DataFrame-re elvégzi a következőket:
+- Írd ki a describe() eredményét
+- Számítsd ki a Price oszlop 99. percentilisét
+- Szűrd ki a 99. percentilis feletti sorokat (felülírd a df változót)
+- Írd ki hány sor maradt és mi a szűrési határ EUR/éj-ben
+
+
+------------------------------------------------------------
+4. KORRELÁCIÓ-HEATMAP
+------------------------------------------------------------
+
+Írj Python kódot, amely elkészíti a df DataFrame numerikus oszlopainak korreláció-heatmapjét. Használj seaborn heatmap-et: annot=True, cmap='RdBu_r', vmin=-1, vmax=1, fmt='.2f'. Méret: 14×9, legyen cím.
+
+
+------------------------------------------------------------
+5. LOG-TRANSZFORMÁLT ÁR KDE DIAGRAM
+------------------------------------------------------------
+
+Írj Python kódot, amely:
+- Létrehoz egy df_log másolatot a df-ből, ahol a Price oszlop = np.log10(df['Price'])
+- Készít egy sns.displot KDE diagramot: hue='City', fill=True, kind='kde'
+- Cím: 'Ár eloszlás városonként (log10 skála)'
+
+
+------------------------------------------------------------
+6. ÖSSZEFÜGGÉS-VIZSGÁLATOK (BOXPLOTOK)
+------------------------------------------------------------
+
+Írj Python kódot, amely három boxplot diagramot készít egymás alá (3 külön ábra):
+
+1. x='Cleanliness Rating', y='Guest Satisfaction' – a df DataFrame-ből, palette='Set3', méret 12×5
+
+2. City Center (km) binning: vágd 3 km-es lépésekkel (0–3, 3–6, 6–9, … 24–27 km) a df DataFrame City Center (km) oszlopát, y tengely = log10(Price). palette='Set3', méret 12×5
+
+3. Guest Satisfaction binning: vágd 10-es lépésekkel (0–10, 10–20, … 90–100), y tengely = log10(Price). palette='Set3', méret 12×5
+
+Minden diagramnál legyen cím és tengelyfeliratok.
+
+
+------------------------------------------------------------
+7.1 BUDAPEST SZŰRÉS, ADATELŐKÉSZÍTÉS, ELBOW METHOD
+------------------------------------------------------------
+
+Írj Python kódot, amely:
+- A df DataFrame-ből szűri a budapesti adatokat: df_bp = df[df['City'] == 'Budapest'].copy()
+- A kategorikus oszlopokat one-hot kódolja (pd.get_dummies), a bool oszlopokat int8-ra konvertálja
+- A folytonos numerikus oszlopokat StandardScaler-rel standardizálja → X_scaled
+- Elbow method: K = 2-től 15-ig KMeans futtatás, inertia görbe kirajzolása
+- Legyen cím, rács, méret: 10×5
+
+
+------------------------------------------------------------
+7.2 K-MEANS ÉS PCA VIZUALIZÁCIÓ
+------------------------------------------------------------
+
+Az előző kód folytatásaként:
+- Futtass KMeans klaszterezést K=4 értékkel (n_init='auto', random_state=42) az X_scaled mátrixon
+- Add hozzá a klaszter címkéket a df_bp DataFrame-hez
+- Írd ki a klaszter profilokat: csoportonkénti átlagok a Price, Guest Satisfaction, City Center (km) és Bedrooms oszlopokra
+- PCA 2 komponensre: scatter plot klaszterszín szerint, palette='Set2', méret 10×7, legyen jelmagyarázat és cím
+
+
+------------------------------------------------------------
+8. RANDOM FOREST ÁR-ELŐREJELZÉS
+------------------------------------------------------------
+
+Írj Python kódot, amely felépít egy Random Forest modellt a budapesti Airbnb árak előrejelzésére:
+- df_bp a budapesti DataFrame (one-hot kódolt, az előző feladatból)
+- Cél változó (y): Price, a többi oszlop feature (X) – a City és Cluster oszlopokat hagyd ki ha vannak
+- Train/test split: 80/20, random_state=42
+- RandomForestRegressor(n_estimators=500, random_state=42, n_jobs=-1)
+- Írd ki a Train és Test MAE, RMSE, R² értékeket
+- Készíts top 15 feature importance barplot diagramot (vízszintes barh), méret 10×6
+
+
+------------------------------------------------------------
+9. COSINE SIMILARITY AJÁNLÓ (OPCIONÁLIS)
+------------------------------------------------------------
+
+Írj Python kódot, amely cosine similarity alapú szállásajánlót épít:
+- A df (teljes, szűrt) DataFrame-ből használd ezeket a feature-öket: Price, Guest Satisfaction, City Center (km), Bedrooms, Normalised Attraction Index, Metro Distance (km)
+- Standardizáld StandardScaler-rel
+- Írj egy ajanlj(idx, top_n=5) függvényt, amely kiírja a referencia szálláshely adatait (Város, Room Type, Ár, Értékelés), majd a top_n leghasonlóbb szállást táblázatban (Város, Room Type, Ár, Km a centrumtól, Értékelés, Hasonlóság)
+- Teszteld egy budapesti szállásra (pl. df[df['City']=='Budapest'].index[0]) és egy párizsira
